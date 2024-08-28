@@ -1,93 +1,141 @@
 import React, { useState, useRef } from "react";
 import Header from "./Header";
 import checkValidationData from "../utils/validation";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../utils/firebase.js";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice.js";
 
 const Login = () => {
-  const [isSingIn, setIsSingIn] = useState(true);
-  const [errorMsg, seterrorMsg] = useState("");
+  const dispatch = useDispatch();
+  const [isSignIn, setIsSignIn] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
 
-  const toggleSingup = () => {
-    setIsSingIn(!isSingIn);
-  };
-
+  const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
+
+  const toggleSignup = () => {
+    setIsSignIn(!isSignIn);
+  };
 
   const handleSubmitForm = () => {
     const msg = checkValidationData(
       email.current.value,
       password.current.value
     );
-    seterrorMsg(msg);
+    setErrorMsg(msg);
+    if (msg) return;
+
+    if (!isSignIn) {
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL: "https://avatars.githubusercontent.com/u/118305699?v=4",
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid,
+                  email,
+                  displayName,
+                  photoURL,
+                })
+              );
+              navigate("/browser");
+            })
+            .catch((error) => {
+              setErrorMsg(error.message);
+            });
+        })
+        .catch((error) => {
+          setErrorMsg(`${error.code} - ${error.message}`);
+        });
+    } else {
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/browser");
+        })
+        .catch((error) => {
+          setErrorMsg(`${error.code} - ${error.message}`);
+        });
+    }
   };
+
   return (
     <>
       <Header />
-      <div className="absolute">
-        <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/36a4db5b-dec2-458a-a1c0-662fa60e7473/1115a02b-3062-4dcc-aae0-94028a0dcdff/IN-en-20240820-TRIFECTA-perspective_WEB_eeff8a6e-0384-4791-a703-31368aeac39f_large.jpg"
-          alt="BG-IMG"
-        />
+      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://assets.nflxext.com/ffe/siteui/vlv3/36a4db5b-dec2-458a-a1c0-662fa60e7473/1115a02b-3062-4dcc-aae0-94028a0dcdff/IN-en-20240820-TRIFECTA-perspective_WEB_eeff8a6e-0384-4791-a703-31368aeac39f_large.jpg')" }}>
+        <div className="absolute inset-0 bg-black/50"></div>
       </div>
       <form
         onSubmit={(e) => e.preventDefault()}
-        className="absolute w-4/12  p-10  bg-black/80 my-36 mx-auto right-0 left-0 text-white rounded-md "
+        className="absolute w-full max-w-md p-6 sm:p-10 bg-black/80 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white rounded-md"
       >
-        <h1 className="text-2xl font-bold py-4">
-          {isSingIn ? "Sing In" : "Sind Up"}
+        <h1 className="text-3xl font-bold py-4">
+          {isSignIn ? "Sign In" : "Sign Up"}
         </h1>
 
-        {!isSingIn && (
+        {!isSignIn && (
           <input
-            className="p-2 my-4 w-full bg-slate-800 rounded border-gray-400 placeholder:text-gray-300"
+            className="p-2 my-4 w-full bg-slate-800 rounded border-gray-400 placeholder-gray-300"
             type="text"
             required
+            ref={name}
             placeholder="Enter your Name"
           />
         )}
 
         <input
           ref={email}
-          className="p-2 my-4 w-full bg-slate-800 rounded border-gray-400 placeholder:text-gray-300"
-          type="text"
+          className="p-2 my-4 w-full bg-slate-800 rounded border-gray-400 placeholder-gray-300"
+          type="email"
           placeholder="Enter your email"
+          required
         />
         <input
           ref={password}
           type="password"
-          className="p-2 my-4 w-full  bg-slate-800 rounded border-gray-400"
+          className="p-2 my-4 w-full bg-slate-800 rounded border-gray-400 placeholder-gray-300"
           placeholder="Enter your Password"
+          required
         />
-        <p className="p-2 font-semibold text-red-500 ">{errorMsg}</p>
+        {errorMsg && <p className="p-2 font-semibold text-red-500">{errorMsg}</p>}
         <button
           onClick={handleSubmitForm}
-          className="p-2 my-4 bg-red-600 w-full rounded"
+          className="p-2 my-4 bg-red-600 w-full rounded hover:bg-red-700 transition duration-200 ease-in-out"
           type="submit"
         >
-          {isSingIn ? "Sing In" : "Sind Up"}
+          {isSignIn ? "Sign In" : "Sign Up"}
         </button>
-        {isSingIn && (
-          <p>
-            New to Netflix ?
-            <span
-              onClick={toggleSingup}
-              className="cursor-pointer font-semibold px-1 hover:underline"
-            >
-              Sing Up Now.
-            </span>
-          </p>
-        )}
-        {!isSingIn && (
-          <p>
-            Already have an account ?
-            <span
-              onClick={toggleSingup}
-              className="cursor-pointer font-semibold px-1 hover:underline"
-            >
-              Sing In Now.
-            </span>
-          </p>
-        )}
+        <p className="py-4">
+          {isSignIn ? "New to Netflix?" : "Already have an account?"}
+          <span
+            onClick={toggleSignup}
+            className="cursor-pointer font-semibold px-1 hover:underline"
+          >
+            {isSignIn ? "Sign Up Now." : "Sign In Now."}
+          </span>
+        </p>
       </form>
     </>
   );
