@@ -9,7 +9,6 @@ const usePopularMovies = () => {
     const getPopulermovie = async () => {
         const response = await fetch('https://api.themoviedb.org/3/trending/movie/day?page=1', options);
         const data = await response.json();
-        //  console.log(data);
         dispatch(addPopularMovie(data.results))
 
     };
