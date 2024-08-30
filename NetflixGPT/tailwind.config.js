@@ -5,8 +5,27 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      scrollbar: ['rounded'],
+    },
   },
-  plugins: [],
-}
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities(
+        {
+          '.scrollbar-hide': {
+            'scrollbar-width': 'none',
+            '-ms-overflow-style': 'none',
+          },
+          '.scrollbar-hide::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+        ['responsive', 'hover']
+      );
+    },
+  ],
+};
+
+
 

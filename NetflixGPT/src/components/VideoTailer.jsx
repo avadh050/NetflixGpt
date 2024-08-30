@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 const VideoTailer = ({ movieId }) => {
     useMovieVideo(movieId);
 
-    const trailerVideo = useSelector((store) => store.movie?.video);
+    const trailerVideo = useSelector((store) => store?.movie?.video);
 
     if (!trailerVideo) {
         return <div>Loading...</div>;
