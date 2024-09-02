@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice.js";
 import { USER_AVATAR } from "../utils/contants.js";
 
+
 const Login = () => {
   const dispatch = useDispatch();
   const [isSignIn, setIsSignIn] = useState(true);
@@ -70,6 +71,7 @@ const Login = () => {
       )
         .then((userCredential) => {
           const user = userCredential.user;
+
         
         })
         .catch((error) => {

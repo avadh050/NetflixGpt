@@ -3,6 +3,7 @@ import useMovieVideo from "./hooks/useMovieVideo";
 import { useSelector } from "react-redux";
 
 const VideoTailer = ({ movieId }) => {
+    
     useMovieVideo(movieId);
 
     const trailerVideo = useSelector((store) => store?.movie?.video);

@@ -4,7 +4,7 @@ import MovieCard from "./MovieCard";
 const MovieList = ({ title, movie }) => {
 
   if (!movie || !Array.isArray(movie)) {
-    console.error("movies is null, undefined, or not an array:", movie);
+    // console.error("movies is null, undefined, or not an array:", movie);
     return <div className="text-center text-gray-500">No movies available</div>;
   }
 
