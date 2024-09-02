@@ -21,4 +21,6 @@ export const options = {
     {
       identifier : 'gujarati' , name : 'Gujarati'
     }
-  ]
+  ];
+
+  export const API_KEY = "sk-Qjis_LlTknf089YXObwZ1H7CXlcFZ89dVW_Evpo03gT3BlbkFJJENnJaOftC-UCRIvckpZFBGzm_Vm8o4KvdZ1yt50kA";
