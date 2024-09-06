@@ -1,27 +1,31 @@
 import React, { useRef } from "react";
 import lang from "../utils/languagecontans";
-import { useSelector } from "react-redux";
-import openai from "../utils/openAi";
+import { useDispatch, useSelector } from "react-redux";
+import { options } from "../utils/contants";
+import { addsearchedMovie } from "../utils/movieSlice";
 
 const GptSearchBar = () => {
+  const searchMovies = useDispatch();
   const searchText = useRef(null);
   const langkey = useSelector((store) => store?.config?.lang);
 
   const handleGptSearchClick = async () => {
+    if (!searchText.current.value) return;
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: searchText.current.value }],
-      });
-      console.log(completion.choices);
-    } catch (error) {
-      console.log(error);
+      const res = await fetch(
+        `https://api.themoviedb.org/3/search/movie?query=${searchText.current.value}&include_adult=false&language=en-US&page=1`,
+        options
+      );
+      const data = await res.json();
+      searchMovies(addsearchedMovie(data.results));
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
     <div
-      className="bg-black h-screen flex items-center justify-center"
+      className="w-full bg-black h-screen flex items-center justify-center "
       style={{
         backgroundImage:
           "url('https://assets.nflxext.com/ffe/siteui/vlv3/36a4db5b-dec2-458a-a1c0-662fa60e7473/1115a02b-3062-4dcc-aae0-94028a0dcdff/IN-en-20240820-TRIFECTA-perspective_WEB_eeff8a6e-0384-4791-a703-31368aeac39f_large.jpg')",

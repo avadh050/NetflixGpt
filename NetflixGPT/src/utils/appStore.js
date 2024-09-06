@@ -11,7 +11,6 @@ const appStore = configureStore(
             movie: moviesReduser,
             gpt: GptReduser,
             config: ConfigReduser
-
         }
     }
 )
